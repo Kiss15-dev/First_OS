@@ -1,9 +1,31 @@
 [org 0x7c00]
+KERNEL_OFFSET equ 0x1000
+KERNEL_SECTORS equ 18
+
 [bits16]
 
 start:
+	xor ax, ax
+	mov ds, ax
+	mov es, ax
+	mov ss, ax
+	mov sp, 0x7c00
+
+	mov bx, KERNEL_OFFSET
+	mov al, KERNEL_SECTORS
+	mov ch, 0
+	mov dh, 0
+	mov cl, 2
+	mov ah, 0x02
+	int 0x13
+
+	in al, 0x92
+	or al, 2
+	out 0x92, al
+
 	cli 
 	lgdt [gdt_descriptor]
+
 
 	mov eax, cr0
 	or eax, 0x1
@@ -11,7 +33,7 @@ start:
 
 	jmp CODE_SEG:init_pm
 
-[bits 32]
+[bits32]
 init_pm:
 	mov ax, DATA_SEG
 	mov ds, ax
@@ -20,7 +42,10 @@ init_pm:
 	mov fs, ax
 	mov gs, ax
 
-	jmp $
+	mov esp, 0x90000
+	mov ebp, esp
+
+	jmp KERNEL_OFFSET
 
 gdt_start:
     ; Каждая запись (дескриптор) занимает 8 байт
