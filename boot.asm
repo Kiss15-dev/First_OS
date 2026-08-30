@@ -2,7 +2,7 @@
 KERNEL_OFFSET equ 0x1000
 KERNEL_SECTORS equ 18
 
-[bits16]
+[bits 16]
 
 start:
 	xor ax, ax
@@ -13,27 +13,26 @@ start:
 
 	mov bx, KERNEL_OFFSET
 	mov al, KERNEL_SECTORS
-	mov ch, 0
-	mov dh, 0
-	mov cl, 2
-	mov ah, 0x02
+	mov ch, 0 ; цилиндр 0
+	mov dh, 0 ; головка 0
+	mov cl, 2 ; старт с 2 сектора (ядро), 1 сектор загрузчик
+	mov ah, 0x02 ; функция чтения секторов BIOS
 	int 0x13
 
-	in al, 0x92
+	in al, 0x92 ; включение линии А20
 	or al, 2
 	out 0x92, al
 
 	cli 
 	lgdt [gdt_descriptor]
-
-
-	mov eax, cr0
+ 
+	mov eax, cr0 ; включение бита PM
 	or eax, 0x1
 	mov cr0, eax
 
 	jmp CODE_SEG:init_pm
 
-[bits32]
+[bits 32]
 init_pm:
 	mov ax, DATA_SEG
 	mov ds, ax
@@ -77,7 +76,6 @@ gdt_descriptor:
 ; Константы для селекторов (смещения внутри GDT)
 CODE_SEG equ gdt_code - gdt_start ; Вычисляется как 0x08
 DATA_SEG equ gdt_data - gdt_start ; Вычисляется как 0x10
-
 
 times 510 - ($ - $$) db 0
 dw 0xaa55
