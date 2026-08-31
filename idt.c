@@ -3,6 +3,9 @@
 #include "idt.h"
 #include "pic.h"
 
+extern void keyboard_isr(void);
+extern void timer_isr(void);
+
 idt_entity_t idt[256];
 static idtr_t idtr;
 
@@ -24,7 +27,10 @@ void idt_init(void) {
 		idt_set_descriptor(i, 0, 0);
 	}
 
-	//pic_remap(0x20, 0x28);
+	pic_remap(0x20, 0x28);
+	
+	idt_set_descriptor(0x20, timer_isr, 0x8E);
+	idt_set_descriptor(0x21, keyboard_isr, 0x8E);
 
 	__asm__ volatile("lidt %0" : : "m"(idtr));
 }
