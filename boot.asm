@@ -1,6 +1,6 @@
 [org 0x7c00]
 KERNEL_OFFSET equ 0x1000
-KERNEL_SECTORS equ 100
+KERNEL_SECTORS equ 15
 
 [bits 16]
 

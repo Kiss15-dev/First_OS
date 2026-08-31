@@ -1,10 +1,9 @@
-void kernel_main() {
-	char* video_memory = (char*)0xB8000;	
+#include "idt.h"
 
-	for (int i = 0; i < 80 * 25 * 2; ) {
-		video_memory[i] = ' ';
-		i += 2;
-	}
+void kernel_main() {
+	idt_init();
+
+	//__asm__ volatile("sti");
 
 	while(1);
 }

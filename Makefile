@@ -15,14 +15,20 @@ $(IMAGE): boot.bin kernel.bin
 boot.bin: boot.asm
 	$(ASM) -f bin boot.asm -o boot.bin
 
-kernel.bin: kernel_entry.o kernel.o
-	$(LD) $(LD_FLAGS) kernel_entry.o kernel.o -o kernel.bin
+kernel.bin: kernel_entry.o kernel.o idt.o pic.o
+	$(LD) $(LD_FLAGS) kernel_entry.o kernel.o idt.o pic.o -o kernel.bin
 
 kernel_entry.o: kernel_entry.asm
 	$(ASM) -f elf32 kernel_entry.asm -o kernel_entry.o
 
 kernel.o: kernel.c
 	$(CC) $(CC_FLAGS) kernel.c -o kernel.o
+
+pic.o: pic.c
+	$(CC) $(CC_FLAGS) pic.c -o pic.o
+
+idt.o: idt.c
+	$(CC) $(CC_FLAGS) idt.c -o idt.o
 
 run: $(IMAGE)
 	qemu-system-i386 -drive format=raw,file=$(IMAGE)
