@@ -1,4 +1,5 @@
-[bits 32]
+[bits 64]
+%include "macros.inc"
 
 global _start
 global keyboard_isr
@@ -13,13 +14,13 @@ _start:
 	jmp $
 
 keyboard_isr:
-	pushad
+	pushall
 	call keyboard_handler
-	popad
-	iretd
+	popall
+	iretq
 
 timer_isr:
-	pushad
+	pushall
 	call timer_handler
-	popad
-	iretd
+	popall
+	iretq

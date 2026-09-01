@@ -2,8 +2,8 @@ ASM = nasm
 CC = gcc
 LD = ld
 
-CC_FLAGS = -m32 -c -ffreestanding -fno-pie -nostdlib
-LD_FLAGS = -m elf_i386 -Ttext 0x1000 --oformat binary
+CC_FLAGS = -c -ffreestanding -fno-pie -nostdlib -m64
+LD_FLAGS = -m elf_x86_64 -Ttext 0x9000 -e _start --oformat binary
 
 IMAGE = os-image.bin
 
@@ -19,7 +19,7 @@ kernel.bin: kernel_entry.o kernel.o idt.o pic.o keyboard.o
 	$(LD) $(LD_FLAGS) kernel_entry.o kernel.o idt.o pic.o keyboard.o -o kernel.bin
 
 kernel_entry.o: kernel_entry.asm
-	$(ASM) -f elf32 kernel_entry.asm -o kernel_entry.o
+	$(ASM) -f elf64 kernel_entry.asm -o kernel_entry.o
 
 kernel.o: kernel.c
 	$(CC) $(CC_FLAGS) kernel.c -o kernel.o
@@ -34,7 +34,7 @@ keyboard.o: keyboard.c
 	$(CC) $(CC_FLAGS) keyboard.c -o keyboard.o
 
 run: $(IMAGE)
-	qemu-system-i386 -drive format=raw,file=$(IMAGE)
+	qemu-system-x86_64 -drive format=raw,file=$(IMAGE)
 
 clean:
 	rm -f *.o *.bin $(IMAGE)

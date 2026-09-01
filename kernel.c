@@ -2,7 +2,7 @@
 #include "types.h"
 #include "io.h"
 
-volatile uint32_t timer_tick = 0;
+volatile uint64_t timer_tick = 0;
 
 void timer_handler() {
 	timer_tick++;
