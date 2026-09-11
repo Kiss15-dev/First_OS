@@ -14,7 +14,7 @@ void timer_handler() {
 void kernel_main() {
 	idt_init();
 
-	int* a = (int*)malloc(4);
+	int* a = (int*)kmalloc(4);
 
 	__asm__ volatile("sti");
 
