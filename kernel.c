@@ -1,6 +1,7 @@
 #include "idt.h"
 #include "types.h"
 #include "io.h"
+#include "allocator.h"
 
 volatile uint64_t timer_tick = 0;
 
@@ -12,6 +13,8 @@ void timer_handler() {
 
 void kernel_main() {
 	idt_init();
+
+	int* a = (int*)malloc(4);
 
 	__asm__ volatile("sti");
 
