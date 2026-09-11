@@ -12,6 +12,7 @@ void timer_handler() {
 }
 
 void kernel_main() {
+	add_page();
 	idt_init();
 
 	int* a = (int*)kmalloc(4);

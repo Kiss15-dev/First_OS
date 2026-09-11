@@ -4,12 +4,12 @@
 static void* next_page = (void*)HEAP_START;
 
 void* pmm_alloc_page() {
-	uint8_t* page = (uint8_t*)next_page;
+	void* page = next_page;
 	
 	if ((uintptr_t)page + PAGE_SIZE <= (uintptr_t)HEAP_END) {
-		next_page = (uint8_t*)next_page + PAGE_SIZE;
+		next_page = (void*)((uintptr_t)next_page + PAGE_SIZE);
 
-		return (void*)page;
+		return page;
 	}
 
 	return NULL;
