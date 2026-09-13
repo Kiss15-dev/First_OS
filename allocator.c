@@ -10,6 +10,7 @@ struct BlockHeader
 
 static uintptr_t bump_ptr = 0;
 static uintptr_t page_end = 0;
+
 static struct BlockHeader* first_block = NULL;
 static struct BlockHeader* current_blockheader = NULL;
 static struct BlockHeader* find_block = NULL;
@@ -19,22 +20,29 @@ void* add_page() {
 
 	if (page == NULL) return NULL;
 
-	first_block = (struct BlockHeader*)page;
-	first_block->size_and_flag = 0;
-	first_block->next = NULL;
+	if (first_block == NULL) {
+		first_block = (struct BlockHeader*)page;
+		first_block->size_and_flag = 0;
+		first_block->next = NULL;
+	}
+
+	struct BlockHeader* first_block_page = (struct BlockHeader*)page;
+	first_block_page->size_and_flag = 0;
+	first_block_page->next = NULL;
 
 	if (current_blockheader != NULL) {
-		current_blockheader->next = first_block;
+		current_blockheader->next = first_block_page;
 	}
 
 	bump_ptr = (uintptr_t)page + sizeof(struct BlockHeader);
 	page_end = (uintptr_t)page + PAGE_SIZE;
-	current_blockheader = first_block;
-	find_block = first_block;
+	current_blockheader = first_block_page;
 }	
 
 void* kmalloc(size_t size) {
+	if (first_block == NULL) return NULL;
 	if (size <= 0) return NULL;
+
 	size = (size + 15) & ~15;
 	int total_size = sizeof(struct BlockHeader) + size;
 	void* allocated_memory;
@@ -69,12 +77,13 @@ void* kmalloc(size_t size) {
 
 	current_blockheader->next = new_header;
 	current_blockheader = new_header;
-	bump_ptr += total_size;
+	bump_ptr += (uintptr_t)current_blockheader + sizeof(struct BlockHeader);
 
 	return allocated_memory;
 }
 
 void* krealloc(void* allocated_ptr, size_t new_size) {
+	if (first_block == NULL) return allocated_ptr;
 	if (new_size <= 0) return allocated_ptr;
 
 	new_size = (new_size + 15) & ~15;
@@ -84,18 +93,18 @@ void* krealloc(void* allocated_ptr, size_t new_size) {
 
 	if ((allocated_block->size_and_flag & ~0x1) == new_size) return allocated_ptr;
 
-	if (new_size < allocated_block->size_and_flag & ~0x1) {
+	if (new_size < (allocated_block->size_and_flag & ~0x1)) {
 		allocated_block->size_and_flag = allocated_block->size_and_flag & ~0x1;
 		allocated_block->size_and_flag = new_size | 0x1;
 
 		return allocated_ptr;
 	}
 
-	if (new_size > allocated_block->size_and_flag & ~0x1) {
+	if (new_size > (allocated_block->size_and_flag & ~0x1)) {
 		uint64_t sum_size;
 		struct BlockHeader* next_block = allocated_block;
 
-		while (next_block->next != NULL && next_block->size_and_flag & 0x1 != 1) {
+		while (next_block->next != NULL && (next_block->size_and_flag & 0x1) != 1) {
 			next_block = next_block->next;
 			sum_size += next_block->size_and_flag + sizeof(struct BlockHeader);	
 
@@ -127,6 +136,7 @@ void* krealloc(void* allocated_ptr, size_t new_size) {
 }
 
 void kfree(void* allocated_ptr) {
+	if (first_block == NULL) return;
 	if (allocated_ptr == NULL) return;
 
 	struct BlockHeader* ptr = (struct BlockHeader*)allocated_ptr;

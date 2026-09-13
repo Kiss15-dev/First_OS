@@ -17,6 +17,8 @@ void kernel_main() {
 
 	int* a = (int*)kmalloc(4);
 
+	*a = 50;
+
 	__asm__ volatile("sti");
 
 	while(1);
