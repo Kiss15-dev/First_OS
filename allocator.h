@@ -1,8 +1,11 @@
 #ifndef ALLOCATOR_H
 #define ALLOCATOR_H
 
-void add_page();
+#include "types.h"
+
+void* add_page();
 void* kmalloc(size_t size);
+void* krealloc(void* allocated_ptr, size_t new_size);
 void kfree(void* allocated_ptr);
 
 #endif

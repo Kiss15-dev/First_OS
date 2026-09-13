@@ -21,3 +21,9 @@ void kernel_main() {
 
 	while(1);
 }
+
+void __stack_chk_fail(void) {
+    while(1) {
+        __asm__ __volatile__("hlt"); 
+    }
+}
