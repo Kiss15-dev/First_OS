@@ -2,8 +2,13 @@ ASM = nasm
 CC = gcc
 LD = ld
 
-CC_FLAGS = -c -ffreestanding -fno-pie -nostdlib -m64
+CC_FLAGS = -c -ffreestanding -fno-pie -nostdlib -m64 -Iinclude
 LD_FLAGS = -m elf_x86_64 -Ttext 0x9000 -e _start --oformat binary
+
+B = boot
+K = kernel
+D = drivers
+L = lib
 
 IMAGE = os-image.bin
 
@@ -12,38 +17,38 @@ all: $(IMAGE)
 $(IMAGE): boot.bin kernel.bin
 	cat boot.bin kernel.bin > $(IMAGE)
 
-boot.bin: boot.asm
-	$(ASM) -f bin boot.asm -o boot.bin
+boot.bin: $B/boot.asm
+	$(ASM) -f bin $B/boot.asm -o boot.bin
 
-kernel.bin: kernel_entry.o kernel.o idt.o pic.o keyboard.o allocator.o pmm.o string.o vector.o
-	$(LD) $(LD_FLAGS) kernel_entry.o kernel.o idt.o pic.o keyboard.o allocator.o pmm.o string.o vector.o -o kernel.bin
+kernel.bin: $B/kernel_entry.o $K/kernel.o $K/idt.o $K/pic.o $D/keyboard.o $K/allocator.o $K/pmm.o $L/string.o $L/vector.o
+	$(LD) $(LD_FLAGS) $B/kernel_entry.o $K/kernel.o $K/idt.o $K/pic.o $D/keyboard.o $K/allocator.o $K/pmm.o $L/string.o $L/vector.o -o kernel.bin
 
-kernel_entry.o: kernel_entry.asm
-	$(ASM) -f elf64 kernel_entry.asm -o kernel_entry.o
+$B/kernel_entry.o: $B/kernel_entry.asm
+	$(ASM) -f elf64 $B/kernel_entry.asm -o $B/kernel_entry.o
 
-kernel.o: kernel.c
-	$(CC) $(CC_FLAGS) kernel.c -o kernel.o
+$K/kernel.o: $K/kernel.c
+	$(CC) $(CC_FLAGS) $K/kernel.c -o $K/kernel.o
 
-pic.o: pic.c
-	$(CC) $(CC_FLAGS) pic.c -o pic.o
+$K/pic.o: $K/pic.c
+	$(CC) $(CC_FLAGS) $K/pic.c -o $K/pic.o
 
-idt.o: idt.c
-	$(CC) $(CC_FLAGS) idt.c -o idt.o
+$K/idt.o: $K/idt.c
+	$(CC) $(CC_FLAGS) $K/idt.c -o $K/idt.o
 
-keyboard.o: keyboard.c
-	$(CC) $(CC_FLAGS) keyboard.c -o keyboard.o
+$D/keyboard.o: $D/keyboard.c
+	$(CC) $(CC_FLAGS) $D/keyboard.c -o $D/keyboard.o
 
-allocator.o: allocator.c
-	$(CC) $(CC_FLAGS) allocator.c -o allocator.o
+$K/allocator.o: $K/allocator.c
+	$(CC) $(CC_FLAGS) $K/allocator.c -o $K/allocator.o
 
-pmm.o: pmm.c
-	$(CC) $(CC_FLAGS) pmm.c -o pmm.o
+$K/pmm.o: $K/pmm.c
+	$(CC) $(CC_FLAGS) $K/pmm.c -o $K/pmm.o
 
-string.o: string.c
-	$(CC) $(CC_FLAGS) string.c -o string.o
+$L/string.o: $L/string.c
+	$(CC) $(CC_FLAGS) $L/string.c -o $L/string.o
 
-vector.o: vector.c
-	$(CC) $(CC_FLAGS) vector.c -o vector.o
+$L/vector.o: $L/vector.c
+	$(CC) $(CC_FLAGS) $L/vector.c -o $L/vector.o
 
 run: $(IMAGE)
 	qemu-system-x86_64 -drive format=raw,file=$(IMAGE)

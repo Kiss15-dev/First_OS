@@ -4,7 +4,7 @@
 static void* next_page = (void*)HEAP_START;
 
 void* pmm_alloc_page() {
-	if (next_page == NULL) return NULL
+	if (next_page == NULL) return NULL;
 	void* page = next_page;
 	
 	if ((uintptr_t)page + PAGE_SIZE <= (uintptr_t)HEAP_END) {
