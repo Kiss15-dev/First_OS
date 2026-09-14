@@ -144,4 +144,21 @@ void kfree(void* allocated_ptr) {
 	ptr -= 1;
 
 	ptr->size_and_flag = ptr->size_and_flag & ~0x1;
+
+	struct BlockHeader* next_blockheader = ptr->next;
+
+	if (next_blockheader != NULL && (next_blockheader->size_and_flag & 0x1) != 1) {
+		uint64_t new_size = sizeof(struct BlockHeader) + next_blockheader->size_and_flag;
+		ptr->size_and_flag += new_size;
+
+		if (next_blockheader->next == NULL) {
+			current_blockheader = (struct BlockHeader*)((uintptr_t)next_blockheader + sizeof(struct BlockHeader));
+			bump_ptr = (uintptr_t)current_blockheader + sizeof(struct BlockHeader);
+			ptr->next = current_blockheader;
+
+			return;
+		}
+
+		ptr->next = next_blockheader->next;
+	}
 }
