@@ -50,7 +50,9 @@ init_pm:
     mov ecx, 4096         
     rep stosd             
 
-    mov dword [0x1000], 0x2000 | 0x03 
+    mov dword [0x1000], 0x2000 | 0x03
+    mov dword [0x1000 + 511 * 8], 0x2000 | 0x03
+    mov dword [0x1000 + 511 * 8 + 4], 0
     mov dword [0x2000], 0x3000 | 0x03 
     mov dword [0x3000], 0x4000 | 0x03 
 
@@ -88,10 +90,10 @@ init_lm:
     mov fs, ax
     mov gs, ax
 
-    mov rsp, 0x80000
+    mov rsp, 0xFFFFFFFF80080000
     mov rbp, rsp
 
-    mov rbx, KERNEL_OFFSET
+    mov rbx, 0xFFFFFFFF80000000 + KERNEL_OFFSET
     jmp rbx
 
 align 8

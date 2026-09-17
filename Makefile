@@ -2,8 +2,8 @@ ASM = nasm
 CC = gcc
 LD = ld
 
-CC_FLAGS = -c -ffreestanding -fno-pie -nostdlib -m64 -Iinclude
-LD_FLAGS = -m elf_x86_64 -Ttext 0x9000 -e _start --oformat binary
+CC_FLAGS = -c -ffreestanding -fno-pic -fno-pie -mcmodel=kernel -mno-red-zone -nostdlib -m64 -Iinclude
+LD_FLAGS = -m elf_x86_64 -T linker.ld --oformat binary
 
 B = boot
 K = kernel

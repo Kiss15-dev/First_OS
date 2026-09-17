@@ -10,6 +10,12 @@ extern keyboard_handler
 extern timer_handler
 
 _start:
+	mov rax, 0xFFFFFFFF80001000
+	mov qword [rax], 0
+
+	mov rax, cr3
+	mov cr3, rax
+
 	call kernel_main
 	jmp $
 
