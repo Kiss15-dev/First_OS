@@ -7,12 +7,12 @@ struct GDT_Pointer gdt_ptr;
 struct TSS tss_entry;
 
 void set_gdt_gate(int num, uint8_t access, uint8_t gran) {
-	gdt[num].limit_low = 0;
+	gdt[num].limit_low = 0xFFFF;
 	gdt[num].base_low = 0;
 	gdt[num].base_middle = 0;
 	gdt[num].base_high = 0;
-	gdt[num],access = access;
-	gdt[num].granularity = gran;
+	gdt[num].access = access;
+	gdt[num].granularity = gran | 0x0F;
 }
 
 void set_gdt_tss(int num, uint64_t tss_address, uint32_t tss_size) {
@@ -30,8 +30,10 @@ void set_gdt_tss(int num, uint64_t tss_address, uint32_t tss_size) {
 }
 
 void init_gdt_kernel(void) {
-	gdt_ptr.limit = (sizeof(struct GDT_Descriptor) * GDT_ENTRIES) - 1;
+	gdt_ptr.limit = sizeof(gdt) - 1;
 	gdt_ptr.base = (uint64_t)&gdt;
+
+	my_memset(&gdt, 0, sizeof(gdt))
 
 	set_gdt_gate(0, 0, 0);
 	set_gdt_gate(1, 0x9A, 0x20);
@@ -46,4 +48,8 @@ void init_gdt_kernel(void) {
 
 	__asm__ volatile("lgdt %0" :: "m"(gdt_ptr));
 	__asm__ volatile("ltr %%ax" :: "a"(0x28));
+}
+
+void update_tss_rsp0(uint64_t new_rsp0) {
+	tss_entry.rsp0 = new_rsp0;
 }

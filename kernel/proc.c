@@ -34,7 +34,8 @@ struct proc* proc_create(uint64_t pml4_root_phys, uint64_t entry_point, uint16_t
 	new_proc->kstack = (void*)pmm_alloc_page();
 	new_proc->pml4_root = vmm_create_pml4_root();
 
-	vmm_map_page((page_table_t*)new_proc->pml4_root, 0x7FFFFFFFE000, (uint64_t)pmm_alloc_page(), 0x7);
+	vmm_map_page((page_table_t*)new_proc->pml4_root, 0x7FFFFFFFE000, (uint64_t)pmm_alloc_page(), PAGE_PRESENT | PAGE_WRITABLE | PAGE_USER);
+	vmm_map_page((page_table_t*)new_proc->pml4_root, VIRTUAL_KERNEL_OFFSET + (uint64_t)new_proc->kstack, (uint64_t)new_proc->kstack, PAGE_PRESENT | PAGE_WRITABLE);
 	new_proc->ustack = (void*)0x7FFFFFFFE000;
 
 	new_proc->context.rip = entry_point;

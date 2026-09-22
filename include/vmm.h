@@ -4,6 +4,9 @@
 #define VIRTUAL_KERNEL_OFFSET 0xFFFFFFFF80000000ULL
 #define KERNEL_PML4_INDEX 511
 #define ENTRIES_COUNT 512
+#define PAGE_PRESENT (1ULL << 0)
+#define PAGE_WRITABLE (1ULL << 1)
+#define PAGE_USER (1ULL << 2) 
 
 #include "types.h"
 
