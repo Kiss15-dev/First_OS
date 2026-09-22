@@ -1,5 +1,6 @@
 #include "types.h"
 #include "pmm.h"
+#include "vmm.h"
 #include "allocator.h"
 
 struct Page
@@ -12,7 +13,7 @@ struct Page
 static struct Page* free_pages_head = NULL;
 
 void pmm_init() {
-	for (uintptr_t page_address = USER_POOL_START; page_address + PAGE_SIZE <= USER_POOL_END; page_address += PAGE_SIZE) {
+	for (uintptr_t page_address = USER_POOL_START - VIRTUAL_KERNEL_OFFSET; page_address + PAGE_SIZE <= USER_POOL_END - VIRTUAL_KERNEL_OFFSET; page_address += PAGE_SIZE) {
 		pmm_free_page((void*)page_address);
 	}
 
