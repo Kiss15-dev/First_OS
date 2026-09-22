@@ -20,7 +20,7 @@ typedef struct {
 	uint64_t rflags;
 	uint64_t rsp;
 	uint64_t ss;
-} context_t
+} context_t;
 
 enum proc_state
 {
@@ -34,15 +34,15 @@ struct proc
 {
 	int pid;
 	enum proc_state state;	
-	void* program_counter;
-	void* stack_pointer;
+	void* kstack;
+	void* ustack;
 	uint64_t pml4_root;
 	context_t context;
 };
 
-extern struct proc proc_list;
+//extern struct proc proc_list;
 
 void proc_list_init(void);
-struct proc proc_create();
+struct proc* proc_create(uint64_t pml4_root_phys, uint64_t entry_point, uint16_t cs, uint16_t ss);
 
 #endif
