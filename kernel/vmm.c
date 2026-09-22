@@ -2,7 +2,7 @@
 #include "vmm.h"
 #include "pmm.h"
 
-int vmm_map_page(page_table_t* pml4_root, uint64_t virtual_address, uint64_t phys_address) {
+int vmm_map_page(page_table_t* pml4_root, uint64_t virtual_address, uint64_t phys_address, uint16_t flags) {
 	uint16_t pml4_idx = (virtual_address >> 39) & 0x1FF;
 	uint16_t pdpt_idx = (virtual_address >> 30) & 0x1FF;
 	uint16_t pd_idx = (virtual_address >> 21) & 0x1FF;
@@ -12,7 +12,7 @@ int vmm_map_page(page_table_t* pml4_root, uint64_t virtual_address, uint64_t phy
 		uint64_t new_table_page = (uint64_t)pmm_alloc_page();
 		if (new_table_page == 0) return 0;
 
-		pml4_root->entries[pml4_idx] = new_table_page | 0x3;
+		pml4_root->entries[pml4_idx] = new_table_page | flags;
 	}
 
 	page_table_t* pdpt = phys_to_virt_address(pml4_root->entries[pml4_idx] & ~0xFFF);
@@ -21,7 +21,7 @@ int vmm_map_page(page_table_t* pml4_root, uint64_t virtual_address, uint64_t phy
 		uint64_t new_table_page = (uint64_t)pmm_alloc_page();
 		if (new_table_page == 0) return 0;
 
-		pdpt->entries[pdpt_idx] = new_table_page | 0x3;
+		pdpt->entries[pdpt_idx] = new_table_page | flags;
 	}
 
 	page_table_t* pd = phys_to_virt_address(pdpt->entries[pdpt_idx] & ~0xFFF);
@@ -30,12 +30,12 @@ int vmm_map_page(page_table_t* pml4_root, uint64_t virtual_address, uint64_t phy
 		uint64_t new_table_page = (uint64_t)pmm_alloc_page();
 		if (new_table_page == 0) return 0;
 
-		pd->entries[pd_idx] = new_table_page | 0x3;
+		pd->entries[pd_idx] = new_table_page | flags;
 	}
 
 	page_table_t* pt = phys_to_virt_address(pd->entries[pd_idx] & ~0xFFF);
 
-	pt->entries[pd_idx] = phys_address | 0x3;
+	pt->entries[pd_idx] = phys_address | flags;
 
 	__asm__ volatile("invlpg (%0)" :: "r"(virtual_address) : "memory");
 	return 1;
