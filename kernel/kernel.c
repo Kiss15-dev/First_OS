@@ -3,6 +3,7 @@
 #include "io.h"
 #include "allocator.h"
 #include "pmm.h"
+#include "gdt.h"
 
 volatile uint64_t timer_tick = 0;
 
@@ -14,6 +15,7 @@ void timer_handler() {
 
 void kernel_main() {
 	//add_page();
+	init_gdt_kernel();
 	pmm_init();
 	idt_init();
 
