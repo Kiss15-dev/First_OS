@@ -9,13 +9,13 @@ struct BlockHeader
 };
 
 static uintptr_t bump_ptr = 0;
-static uintptr_t page_end = 0;
+//static uintptr_t page_end = 0;
 
 static struct BlockHeader* first_block = NULL;
 static struct BlockHeader* current_blockheader = NULL;
 static struct BlockHeader* find_block = NULL;
 
-void* add_page() {
+/*void* add_page() {
 	void* page = pmm_alloc_page();
 
 	if (page == NULL) return NULL;
@@ -37,10 +37,23 @@ void* add_page() {
 	bump_ptr = (uintptr_t)page + sizeof(struct BlockHeader);
 	page_end = (uintptr_t)page + PAGE_SIZE;
 	current_blockheader = first_block_page;
-}	
+}*/
+
+void kallocator_init(void) {
+	if (first_block != NULL) return;
+
+	first_block = (struct BlockHeader*)HEAP_START;
+	first_block->size_and_flag = 0;
+	first_block->next = NULL;
+
+	bump_ptr = (uintptr_t)HEAP_START + sizeof(struct BlockHeader);
+	current_blockheader = first_block;
+}
 
 void* kmalloc(size_t size) {
-	if (first_block == NULL) return NULL;
+	if (first_block == NULL) {
+		kallocator_init();
+	}
 	if (size <= 0) return NULL;
 
 	size = (size + 15) & ~15;
@@ -48,10 +61,7 @@ void* kmalloc(size_t size) {
 	void* allocated_memory;
 	find_block = first_block;
 
-	if (bump_ptr + total_size > page_end) {
-		current_blockheader->size_and_flag = current_blockheader->size_and_flag | 0x1;
-		add_page();
-	}
+	if (bump_ptr + total_size > (uintptr_t)HEAP_END) return NULL;
 
 	while (find_block != NULL) {
 		if (find_block->size_and_flag & 0x1) {
