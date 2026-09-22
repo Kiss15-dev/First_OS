@@ -2,6 +2,7 @@
 #include "types.h"
 #include "io.h"
 #include "allocator.h"
+#include "pmm.h"
 
 volatile uint64_t timer_tick = 0;
 
@@ -12,7 +13,8 @@ void timer_handler() {
 }
 
 void kernel_main() {
-	add_page();
+	//add_page();
+	pmm_init();
 	idt_init();
 
 	int* a = (int*)kmalloc(4);
