@@ -33,7 +33,7 @@ void init_gdt_kernel(void) {
 	gdt_ptr.limit = sizeof(gdt) - 1;
 	gdt_ptr.base = (uint64_t)&gdt;
 
-	my_memset(&gdt, 0, sizeof(gdt))
+	my_memset(&gdt, 0, sizeof(gdt));
 
 	set_gdt_gate(0, 0, 0);
 	set_gdt_gate(1, 0x9A, 0x20);

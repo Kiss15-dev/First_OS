@@ -1,6 +1,5 @@
 %macro pushall 0
     push rax
-    push rax
     push rcx
     push rdx
     push rbx
@@ -32,6 +31,5 @@
     pop rbx
     pop rdx
     pop rcx
-    pop rax
     pop rax
 %endmacro
