@@ -20,8 +20,8 @@ $(IMAGE): boot.bin kernel.bin
 boot.bin: $B/boot.asm
 	$(ASM) -f bin $B/boot.asm -o boot.bin
 
-kernel.bin: $B/kernel_entry.o $K/kernel.o $K/idt.o $K/pic.o $D/keyboard.o $K/allocator.o $K/pmm.o $K/vmm.o $K/gdt.o $K/proc.o $L/string.o $L/vector.o
-	$(LD) $(LD_FLAGS) $B/kernel_entry.o $K/kernel.o $K/idt.o $K/pic.o $D/keyboard.o $K/allocator.o $K/pmm.o $K/vmm.o $K/gdt.o $K/proc.o $L/string.o $L/vector.o -o kernel.bin
+kernel.bin: $B/kernel_entry.o $K/kernel.o $K/idt.o $K/pic.o $D/keyboard.o $K/allocator.o $K/pmm.o $K/vmm.o $K/gdt.o $K/proc.o $K/scheluder.o $L/string.o $L/vector.o
+	$(LD) $(LD_FLAGS) $B/kernel_entry.o $K/kernel.o $K/idt.o $K/pic.o $D/keyboard.o $K/allocator.o $K/pmm.o $K/vmm.o $K/gdt.o $K/proc.o $K/scheluder.o $L/string.o $L/vector.o -o kernel.bin
 
 $B/kernel_entry.o: $B/kernel_entry.asm
 	$(ASM) -f elf64 $B/kernel_entry.asm -o $B/kernel_entry.o
@@ -52,6 +52,9 @@ $K/pmm.o: $K/pmm.c
 
 $K/gdt.o: $K/gdt.c
 	$(CC) $(CC_FLAGS) $K/gdt.c -o $K/gdt.o
+
+$K/scheluder.o: $K/scheluder.c
+	$(CC) $(CC_FLAGS) $K/scheluder.c -o $K/scheluder.o
 
 $L/string.o: $L/string.c
 	$(CC) $(CC_FLAGS) $L/string.c -o $L/string.o

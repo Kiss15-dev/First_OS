@@ -4,14 +4,7 @@
 #include "allocator.h"
 #include "pmm.h"
 #include "gdt.h"
-
-volatile uint64_t timer_tick = 0;
-
-void timer_handler() {
-	timer_tick++;
-
-	outb(0x20, 0x20);
-}
+#include "scheluder.h"
 
 void kernel_main() {
 	//add_page();
@@ -22,6 +15,8 @@ void kernel_main() {
 	int* a = (int*)kmalloc(4);
 
 	*a = 50;
+
+	scheluder_start_first_proc();
 
 	__asm__ volatile("sti");
 

@@ -4,10 +4,12 @@
 global _start
 global keyboard_isr
 global timer_isr
+global start_first_process
+global user_test
 
 extern kernel_main
 extern keyboard_handler
-extern timer_handler
+extern scheluder
 
 _start:
 	mov rax, 0xFFFFFFFF80001000
@@ -27,6 +29,15 @@ keyboard_isr:
 
 timer_isr:
 	pushall
-	call timer_handler
+	call scheluder
 	popall
 	iretq
+
+start_first_process:
+	mov cr3, rsi
+	mov rsp, rdi
+	popall
+	iretq
+
+user_test:
+	jmp user_test
