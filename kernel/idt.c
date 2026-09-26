@@ -5,6 +5,7 @@
 
 extern void keyboard_isr(void);
 extern void timer_isr(void);
+extern void syscall_isr(void);
 
 static idt_entity_t idt[256];
 static idtr_t idtr;
@@ -33,6 +34,7 @@ void idt_init(void) {
 	
 	idt_set_descriptor(0x20, timer_isr, 0x8E);
 	idt_set_descriptor(0x21, keyboard_isr, 0x8E);
+	idt_set_descriptor(0x80, syscall_isr, 0xEE);
 
 	__asm__ volatile("lidt %0" : : "m"(idtr));
 }

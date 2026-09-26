@@ -88,7 +88,7 @@ uint64_t vmm_create_pml4_root(void) {
 uint64_t vmm_get_current_pml4_address(void) {
 	uint64_t pml4_address;
 
-	 __asm__ volatile("movq %%cr3, %0" : "=r" (pml4_address));
+	__asm__ volatile("movq %%cr3, %0" : "=r" (pml4_address));
 
 	return pml4_address;
 }

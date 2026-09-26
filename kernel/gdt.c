@@ -12,7 +12,7 @@ void set_gdt_gate(int num, uint8_t access, uint8_t gran) {
 	gdt[num].base_middle = 0;
 	gdt[num].base_high = 0;
 	gdt[num].access = access;
-	gdt[num].granularity = gran | 0x0F;
+	gdt[num].granularity = gran | 0x80 | 0x0F;
 }
 
 void set_gdt_tss(int num, uint64_t tss_address, uint32_t tss_size) {

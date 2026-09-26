@@ -39,5 +39,6 @@ struct TSS {
 } __attribute__((packed));
 
 void init_gdt_kernel(void);
+void update_tss_rsp0(uint64_t new_rsp0);
 
 #endif

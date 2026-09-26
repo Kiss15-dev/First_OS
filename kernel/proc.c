@@ -3,6 +3,10 @@
 #include "pmm.h"
 #include "types.h"
 #include "proc.h"
+#include "string.h"
+
+extern void user_test();
+extern void user_test_end();
 
 struct proc* proc_list = NULL;
 
@@ -27,7 +31,7 @@ void* search_unused_proc() {
 	return NULL;
 }
 
-struct proc* proc_create(uint64_t pml4_root_phys, uint64_t entry_point, uint16_t cs, uint16_t ss) {
+struct proc* proc_create(uint64_t pml4_root_phys, uint64_t entry_point) {
 	struct proc* new_proc = search_unused_proc();
 	uint8_t* kstack = (uint8_t*)pmm_alloc_page();
 	if (new_proc == NULL) return NULL;
@@ -35,15 +39,19 @@ struct proc* proc_create(uint64_t pml4_root_phys, uint64_t entry_point, uint16_t
 	new_proc->kstack_top = kstack + PAGE_SIZE;
 	new_proc->pml4_root = vmm_create_pml4_root();
 	uint64_t* rsp = (uint64_t*)new_proc->kstack_top;
+	uint64_t code_page_phys = (uint64_t)pmm_alloc_page();
+
+	my_memcpy(&user_test, (void*)code_page_phys, &user_test_end - &user_test);
 
 	vmm_map_page((page_table_t*)new_proc->pml4_root, 0x7FFFFFFFE000, (uint64_t)pmm_alloc_page(), PAGE_PRESENT | PAGE_WRITABLE | PAGE_USER);
+	vmm_map_page((page_table_t*)new_proc->pml4_root, 0x1000, code_page_phys, PAGE_PRESENT | PAGE_WRITABLE | PAGE_USER);
 	vmm_map_page((page_table_t*)new_proc->pml4_root, (uint64_t)(VIRTUAL_KERNEL_OFFSET + (uintptr_t)kstack), (uint64_t)kstack, PAGE_PRESENT | PAGE_WRITABLE);
 
 	rsp--; *rsp = 0x23;
 	rsp--; *rsp = 0x7FFFFFFFF000;
 	rsp--; *rsp = 0x202;
 	rsp--; *rsp = 0x1B;
-	rsp--; *rsp = entry_point;
+	rsp--; *rsp = 0x1000;
 
 	for (int i = 0; i < 15; i++) {
 		rsp--;
@@ -51,6 +59,7 @@ struct proc* proc_create(uint64_t pml4_root_phys, uint64_t entry_point, uint16_t
 	}
 
 	new_proc->rsp = (uint64_t)rsp;
+	new_proc->state = READY;
 
 	return new_proc;
 }

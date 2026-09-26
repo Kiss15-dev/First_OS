@@ -43,6 +43,6 @@ struct proc
 //extern struct proc proc_list;
 
 void proc_list_init(void);
-struct proc* proc_create(uint64_t pml4_root_phys, uint64_t entry_point, uint16_t cs, uint16_t ss);
+struct proc* proc_create(uint64_t pml4_root_phys, uint64_t entry_point);
 
 #endif

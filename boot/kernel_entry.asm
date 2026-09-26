@@ -4,11 +4,17 @@
 global _start
 global keyboard_isr
 global timer_isr
+global syscall_isr
+global start_first_process
+global user_test
+global user_test_end
 
 extern kernel_main
 extern keyboard_handler
-extern timer_handler
+extern scheluder
+extern syscall_handler
 
+section .text
 _start:
 	mov rax, 0xFFFFFFFF80001000
 	mov qword [rax], 0
@@ -27,6 +33,25 @@ keyboard_isr:
 
 timer_isr:
 	pushall
-	call timer_handler
+	call scheluder
 	popall
 	iretq
+
+syscall_isr:
+	pushall
+
+	mov rdi, rsp
+	call syscall_handler
+
+	popall
+	iretq
+
+start_first_process:
+	mov cr3, rsi
+	mov rsp, rdi
+	popall
+	iretq
+
+user_test:
+	jmp user_test
+user_test_end:
