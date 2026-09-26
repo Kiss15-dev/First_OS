@@ -8,6 +8,8 @@
 extern void user_test();
 extern void user_test_end();
 
+extern void user_test();
+
 struct proc* proc_list = NULL;
 
 void proc_list_init(void) {

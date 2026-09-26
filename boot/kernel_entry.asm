@@ -5,9 +5,9 @@ global _start
 global keyboard_isr
 global timer_isr
 global syscall_isr
-global start_first_process
 global user_test
 global user_test_end
+global start_first_process
 
 extern kernel_main
 extern keyboard_handler

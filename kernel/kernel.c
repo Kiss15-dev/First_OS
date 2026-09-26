@@ -20,7 +20,7 @@ void kernel_main() {
 	char* video_memory = (char*)0xB8000;
 	video_memory[0] = 'Y';
 
-	//scheluder_start_first_proc();
+	scheluder_start_first_proc();
 
 	__asm__ volatile("sti");
 
